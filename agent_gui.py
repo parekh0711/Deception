@@ -3,12 +3,16 @@ import random
 import time
 import copy
 
+# +14155238886
+# join prove-serious
+
+
 # client credentials are read from TWILIO_ACCOUNT_SID and AUTH_TOKEN
 client = Client(
     "AC694a0a1bb4494297124460beb33a165a", "31e0622e6a8327b63f44201e8791b1f6"
 )
 
-win_condition = [["normal", "normal"]]
+win_condition = []
 
 
 def send_info(number, message):
@@ -19,6 +23,7 @@ def send_info(number, message):
     client.messages.create(
         body=message, from_=from_whatsapp_number, to=to_whatsapp_number
     )
+    # print(message)
 
 
 class player:
@@ -47,7 +52,7 @@ def grudge(player, players):
         + ". You will only win if he/she dies."
     )
     send_info(player.number, message)
-    win_condition = ["grudge", player.name, player2.name]
+    win_condition.append(["grudge", player.name, player2.name])
 
 
 def infatutation(player, players):
@@ -69,7 +74,7 @@ def infatutation(player, players):
     )
     send_info(player.number, message)
     # print(message)
-    win_condition = ["infatuation", player.name, player2.name]
+    win_condition.append(["infatuation", player.name, player2.name])
 
 
 def scapegoat(player, players):
@@ -81,7 +86,7 @@ def scapegoat(player, players):
     message = "You are now the scapegoat. You win if you get imprisoned. ONLY you win."
     send_info(player.number, message)
     # print(message)
-    win_condition = ["scapegoat", player.name]
+    win_condition.append(["scapegoat", player.name])
 
 
 def switch(player, players):
@@ -125,6 +130,12 @@ def photograph(player, players):
     )
     random.shuffle(temporary)
     i = 1
+    # comment this if there are only 2 virus::::::
+    if len(players) > 6:
+        for t in temporary:
+            if t.name == player.name:
+                temporary.remove(t)
+                break
     while temporary[i].role != temporary[0].role:
         i += 1
     player2 = temporary[i]
@@ -154,6 +165,12 @@ def reveal(player, players):
 
 def intelligence(player, players):
     temporary = copy.deepcopy(players)
+    # comment this if there are only 2 virus::::::
+    if len(players) > 6:
+        for t in temporary:
+            if t.name == player.name:
+                temporary.remove(t)
+                break
     print(player.name, " will get 2 names, one is virus and one is not.")
     for p in temporary:
         if p.role == "service":
@@ -231,11 +248,61 @@ def dojob(player, players):
     return
 
 
+def find_role(name, players):
+    for player in players:
+        if player.name == name:
+            return player.role
+
+
+def remove_player(name, players):
+    for player in players:
+        if player.name == name:
+            players.remove(player)
+            return
+
+
+def print_result(lynched, players):
+    global win_condition
+    win_list = []
+    if win_condition == []:
+        print("Nobody got a win condition.")
+    else:
+        for condition in win_condition:
+            if condition[0] == "scapegoat":
+                print(condition[1], "was a scapegoat.")
+                if lynched == condition[1]:
+                    print(lynched, " wins!")
+                    return
+                else:
+                    remove_player(condition[1], players)
+        for condition in win_condition:
+            if condition[0] == "infatuation":
+                print(condition[1], "was in love with", condition[2])
+                if lynched != condition[2]:
+                    win_list.append(condition[1])
+                else:
+                    remove_player(condition[1], players)
+            if condition[0] == "grudge":
+                print(condition[1], "had a grudge against", condition[2])
+                if lynched == condition[2]:
+                    win_list.append(condition[1])
+                else:
+                    remove_player(condition[1], players)
+    role = find_role(lynched, players)
+    for player in players:
+        if player.role != role:
+            win_list.append(player.name)
+    win_list = set(win_list)
+    print("Winners are:")
+    for player in players:
+        if player.name in win_list:
+            print(player.name, player.role)
+    return
+
+
 if __name__ == "__main__":
     cont = input("Press enter to continue")
     print("Starting game......")
-    # print("How many players?")
-    # players_number=int(input())
     fptr = open("info.txt", "r")
     f1 = fptr.readlines()
     players_number = int(f1[0])
@@ -259,40 +326,47 @@ if __name__ == "__main__":
     for _ in range(s):
         role.append("service")
     random.shuffle(role)
-    random.shuffle(role)
-    jobs = [0, 1, 2, 3, 4, 5]
+    # to remove win condition comment this:::::::::::
+    if players_number > 5:
+        jobs = [0, 1, 2, 3, 4, 5]
+    else:
+        jobs = [1, 2, 3, 4, 5]
     hidden = [6, 7, 8, 9, 10]
     random.shuffle(jobs)
     random.shuffle(hidden)
     index = 0
+    extra = 0
     for _ in range(players_number):
         # name=input('Enter name of player:')
         # number=input('Enter number:')
         name = names.pop()
         number = numbers.pop()
-        job = jobs[_]
+        if _ > 5:
+            job = jobs[extra]
+            extra += 1
+        else:
+            job = jobs[_]
         if job == 0:
             job = hidden[0]
+            random.shuffle(hidden)
         players.append(player(name, number, role.pop(), job))
         index += 1
-    random.shuffle(players)
     random.shuffle(players)
     viruses = []
     for player in players:
         if player.role == "virus":
             viruses.append(player)
-
     for player in players:
         if player.role == "service":
             message = (
-                "Welcome to TripleAgent!\n You are working for "
+                "Welcome to Deception!\n You are working for "
                 + player.role
                 + ".\n Your mission is to find all the V.I.R.U.S Agents."
             )
             send_info(player.number, message)
         else:
             message = (
-                "Welcome to TripleAgent!\n You are working for "
+                "Welcome to Deception!\n You are working for "
                 + player.role
                 + ".\n Your team is:\n"
             )
@@ -309,43 +383,46 @@ if __name__ == "__main__":
         cont = input("Press enter to continue")
 
     lynched = input("Who did you vote:")
-    if win_condition[0][0] == "normal":
-        for player in players:
-            if lynched == player.name:
-                if player.role == "service":
-                    print("V.I.R.U.S wins!")
-                    break
-                else:
-                    print("Service wins!")
-                    break
-    elif win_condition[0][0] == "scapegoat":
-        if lynched == win_condition[0][1]:
-            print(lynched, "wins!")
-    else:
-        for player in players:
-            if lynched == player.name:
-                if player.role == "service":
-                    print("V.I.R.U.S wins!")
-                    break
-                else:
-                    print("Service wins!")
-                    break
-        if win_condition[0][0] == "infatuation":
-            if lynched == win_condition[0][2]:
-                print(win_condition[0][1], " loses as he/she was in love with", lynched)
-            else:
-                print(
-                    win_condition[0][1],
-                    " wins as he/she was in love with",
-                    win_condition[0][2],
-                )
-        if win_condition[0][0] == "grudge":
-            if lynched != win_condition[0][2]:
-                print(win_condition[0][1], " loses as he/she had grudge with", lynched)
-            else:
-                print(win_condition[0][1], " wins as he/she had grudge with", lynched)
-    print("win_condition variable is", win_condition)
-    for player in players:
-        print(player.name, player.role)
+    print("")
+    print_result(lynched, players)
+    # print(win_condition)
+    # if win_condition[0] == "normal":
+    #     for player in players:
+    #         if lynched == player.name:
+    #             if player.role == "service":
+    #                 print("V.I.R.U.S wins!")
+    #                 break
+    #             else:
+    #                 print("Service wins!")
+    #                 break
+    # elif win_condition[0] == "scapegoat":
+    #     if lynched == win_condition[1]:
+    #         print(lynched, "wins!")
+    # else:
+    #     for player in players:
+    #         if lynched == player.name:
+    #             if player.role == "service":
+    #                 print("V.I.R.U.S wins!")
+    #                 break
+    #             else:
+    #                 print("Service wins!")
+    #                 break
+    #     if win_condition[0] == "infatuation":
+    #         if lynched == win_condition[2]:
+    #             print(win_condition[1], " loses as he/she was in love with", lynched)
+    #         else:
+    #             print(
+    #                 win_condition[1],
+    #                 " wins as he/she was in love with",
+    #                 win_condition[2],
+    #             )
+    #     if win_condition[0] == "grudge":
+    #         if lynched != win_condition[2]:
+    #             print(win_condition[1], " loses as he/she had grudge with", lynched)
+    #         else:
+    #             print(win_condition[1], " wins as he/she had grudge with", lynched)
+    # print("win_condition variable is", win_condition)
+    # for player in players:
+    #     print(player.name, player.role)
     fptr.close()
-    time.sleep(100)
+    # time.sleep(100)

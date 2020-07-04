@@ -19,4 +19,4 @@ The game works with whatsapp, and the instructions and role infomation are sent 
 6. Install twilio using :
           pip install twilio
 7. From every player's whatsapp, Add the phone number +14155238886 and send "join prove-serious" to get added to the game. You need to do this just once per 24 hours.
-8. Run agent.py 
+8. Run game.py 

@@ -21,3 +21,9 @@ The game works with whatsapp, and the instructions and role infomation are sent 
 7. Set up sandbox on twilio and update credentials.txt
 8. Add players to sandbox
 9. Run agent_gui.py from command prompt
+
+# Screenshots
+
+
+
+

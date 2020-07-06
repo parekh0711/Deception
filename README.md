@@ -24,6 +24,9 @@ The game works with whatsapp, and the instructions and role infomation are sent 
 
 # Screenshots
 ![Alt text](ss1.png?raw=true )
+![Alt text](ss2.png?raw=true )
+![Alt text](ss3.png?raw=true )
+![Alt text](ss4.png?raw=true )
 
 
 

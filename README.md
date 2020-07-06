@@ -23,7 +23,7 @@ The game works with whatsapp, and the instructions and role infomation are sent 
 9. Run agent_gui.py from command prompt
 
 # Screenshots
-
+![Alt text](ss1.png?raw=true )
 
 
 
